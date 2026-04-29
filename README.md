@@ -124,6 +124,8 @@ Tempo máximo de voo  = ~14.913s ≈ 4,1 horas
 
 - **ATERRISSADO**: estado final. Detectado quando a altitude se aproxima do solo (abaixo de ~5 m), indicando que o voo foi concluído.
 
+![](https://github.com/icarob-eng/avionica_arduino/blob/main/Avionic_state_machine_bg.drawio.png)
+
 ## 6. Descrição
 
 ### 6.1 Sensores — Aquisição Periódica (MPU-6050 + BMP280)
