@@ -27,11 +27,11 @@
 
 #include "ejection.hpp"
 #include "globals.hpp"
-#include <servo.h>
+#include <Servo.h>
 
 namespace Ejection {
 
-  #if mode == pyro
+  #if EJECTION_MODE == EJECTION_MODE_PYRO
 
     // --------------------------------------------------------
     // Variáveis de controle da sequência pirotécnica
@@ -41,11 +41,13 @@ namespace Ejection {
     static bool isActuating = false;        // Indica se um pulso está ativo
     static bool stateHigh = false;          // Estado atual do pino (HIGH/LOW)
 
-  #else
+  #elif EJECTION_MODE == EJECTION_MODE_SERVO
 
     // Servo motor para ejeção mecânica
     Servo ejectionServo;
 
+  #else
+    #error "mode must be PYRO or SERVO"
   #endif
 
   // ------------------------------------------------------------
@@ -53,7 +55,7 @@ namespace Ejection {
   // ------------------------------------------------------------
   void setup(){
 
-    #if mode == PYRO
+    #if EJECTION_MODE == EJECTION_MODE_PYRO
 
       // Configura PB1 (D9) como saída
       DDRB |= (1 << 1);
@@ -61,9 +63,10 @@ namespace Ejection {
       // Garante nível inicial LOW no pino (MOSFET desligado)
       // (Nota: operação correta seria limpar o bit)
       PORTB &= ~(1 << 1);
+    
+      Serial.println("[Ejection] Sistema de ejeção iniciado no modo PYRO");
 
-      Serial.println("[Ejection] Sistema de ejeção iniciado no modo PYRO")
-    #if mode == SERVO
+    #elif EJECTION_MODE == EJECTION_MODE_SERVO
 
       // Inicializa o servo no pino definido
       ejectionServo.attach(SERVO_OUT_PIN);
@@ -73,8 +76,9 @@ namespace Ejection {
 
       // Imprime no serial caso funcione
       Serial.println("[Ejection] Sistema de ejeção iniciado no modo SERVO ");
+
     #else
-      Serial.println("[Ejection] Falha de definição de modo")
+      Serial.println("[Ejection] Falha de definição de modo");
     #endif
   }
 
@@ -87,7 +91,7 @@ namespace Ejection {
   // ------------------------------------------------------------
   bool ejectionEvent() {
 
-    #if mode == pyro
+    #if EJECTION_MODE == EJECTION_MODE_PYRO
         // ----------------------------------------------------
         // Lógica pirotécnica:
         //   - 3 pulsos
@@ -131,7 +135,7 @@ namespace Ejection {
         }
         return true; // Todos os pulsos concluídos
 
-    #if mode == SERVO
+    #elif EJECTION_MODE == EJECTION_MODE_SERVO
         // ----------------------------------------------------
         // Lógica com servo:
         //   Movimento: 0° ↔ 90°
@@ -168,6 +172,9 @@ namespace Ejection {
             return false; // Ainda em execução
         }
         return true; // Sequência finalizada
+
+    #else
+        #error "mode must be PYRO or SERVO"
     #endif
   }
 

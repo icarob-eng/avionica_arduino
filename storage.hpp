@@ -16,6 +16,8 @@
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
 
+#include "globals.hpp"
+
 namespace Storage {
   /**
   * Inicializa a memória flash W25Q128.
@@ -38,6 +40,12 @@ namespace Storage {
   * Quando o buffer enche (10 amostras), grava automaticamente na flash.
   */
   void push(const DadosVoo& dado);
+
+  /**
+  * Adiciona o dado de voo atual ao buffer e grava quando necessário.
+  * Mantém compatibilidade com chamadas existentes em avionica_arduino.ino.
+  */
+  void saveData();
 
   /**
   * Força a gravação do buffer mesmo que não esteja cheio.

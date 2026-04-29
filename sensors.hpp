@@ -10,6 +10,15 @@ namespace Sensor {
   bool setup();
 
   /**
+  * Realiza a leitura completa dos sensores MPU6050 e BMP280.
+  *
+  * Atualiza os campos correspondentes na estrutura global `dadosVoo`.
+  * Também registra timestamps próprios para cada sensor e um
+  * timestamp geral de leitura.
+  */
+  void readData();
+
+  /**
   * Realiza a leitura do MPU6050 (acelerômetro e giroscópio).
   * 
   * Atualiza os campos correspondentes na estrutura global `dadosVoo`.

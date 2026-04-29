@@ -35,8 +35,7 @@
 #include "storage.hpp"
 #include "telemetry.hpp"
 #include "statemachine.hpp"
-#include "ejection.cpp"
-#include <avr/interrupt.h>
+#include "ejection.hpp"
 
 // =============================================================
 // DEFINIÇÃO DA VARIÁVEL GLOBAL
@@ -59,16 +58,17 @@ static volatile uint8_t contadorTicks = 0;
 static volatile bool leituraPendente = false;
 
 // =============================================================
-// ISR — Timer1 Compare Match A (100Hz)
-// Chamada a cada 10ms pelo Timer1 em modo CTC.
+// ISR — Timer2 Compare Match A (100Hz)
+// Chamada a cada 10ms pelo Timer2 em modo CTC.
 // Incrementa o contador de ticks que controla o loop.
 //
 // Registradores configurados em setup():
-//   TCCR1B: WGM12=1 (CTC), CS12=1 (prescaler 256)
-//   OCR1A:  624 → f = 16MHz / (256 × 625) = 100Hz
-//   TIMSK1: OCIE1A=1 (habilita interrupção)
+//   TCCR2A: WGM21=1 (CTC)
+//   TCCR2B: CS22=1, CS20=1 (prescaler 1024)
+//   OCR2A:  155 → f ≈ 100Hz
+//   TIMSK2: OCIE2A=1 (habilita interrupção)
 // =============================================================
-ISR(TIMER1_COMPA_vect) {
+ISR(TIMER2_COMPA_vect) {
     contadorTicks++;
     if (contadorTicks >= 100) contadorTicks = 0;
 }
@@ -87,29 +87,27 @@ ISR(INT0_vect) {
 }
 
 // =============================================================
-// CONFIGURAÇÃO DO TIMER1 EM MODO CTC
+// CONFIGURAÇÃO DO TIMER2 EM MODO CTC
 //
 // Modo CTC (Clear Timer on Compare Match):
-//   O contador TCNT1 incrementa a cada clock/prescaler.
-//   Quando TCNT1 == OCR1A, dispara a interrupção e zera.
+//   O contador TCNT2 incrementa a cada clock/prescaler.
+//   Quando TCNT2 == OCR2A, dispara a interrupção e zera.
 //
-// Cálculo do OCR1A para 100Hz:
+// Cálculo do OCR2A para 100Hz:
 //   f_alvo    = 100 Hz
-//   prescaler = 256
-//   OCR1A     = (16.000.000 / (256 × 100)) - 1 = 624
+//   prescaler = 1024
+//   OCR2A     = (16.000.000 / (1024 × 100)) - 1 ≈ 155
 //
-// TCCR1A = 0x00 → sem PWM, modo CTC usa só TCCR1B
-// TCCR1B:
-//   WGM12 (bit 3) = 1 → modo CTC
-//   CS12  (bit 2) = 1 → prescaler 256
-// TIMSK1:
-//   OCIE1A (bit 1) = 1 → habilita interrupção por comparação
+// TCCR2A = (1 << WGM21) → modo CTC
+// TCCR2B = (1 << CS22) | (1 << CS20) → prescaler 1024
+// TIMSK2:
+//   OCIE2A = 1 → habilita interrupção por comparação
 // =============================================================
-static void configurarTimer1() {
-    TCCR1A = 0x00;
-    TCCR1B = (1 << WGM12) | (1 << CS12);
-    OCR1A  = 624;
-    TIMSK1 = (1 << OCIE1A);
+static void configurarTimer2() {
+    TCCR2A = (1 << WGM21);
+    TCCR2B = (1 << CS22) | (1 << CS20);
+    OCR2A  = 155;
+    TIMSK2 = (1 << OCIE2A);
 }
 
 // =============================================================
@@ -130,7 +128,7 @@ static void configurarINT0() {
 void setup() {
     Serial.begin(9600);
 
-    configurarTimer1();
+    configurarTimer2();
     configurarINT0();
 
     // Inicializa os módulos — aborta se algum falhar

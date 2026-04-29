@@ -22,7 +22,7 @@ namespace StateMachine {
     void setup() {
         dadosVoo.estado = EstadoVoo::ARMADO;
         altitudeMaxima  = 0.0;
-        Serial.println("[STATE] Maquina de estados inicializada: ARMADO");
+        Serial.println(F("[STATE] Maquina de estados inicializada: ARMADO"));
     }
 
     void update() {
@@ -42,7 +42,7 @@ namespace StateMachine {
                 // supera o threshold definido em globals.hpp
                 if (acelTotal > THRESHOLD_LANCAMENTO) {
                     dadosVoo.estado = EstadoVoo::ALTA_ENERGIA;
-                    Serial.println("[STATE] ARMADO → ALTA_ENERGIA");
+                    Serial.println(F("[STATE] ARMADO -> ALTA_ENERGIA"));
                 }
                 break;
 
@@ -54,7 +54,7 @@ namespace StateMachine {
                 // Motor apagou: aceleração cai abaixo do threshold
                 if (acelTotal < THRESHOLD_MOTOR_APAGADO) {
                     dadosVoo.estado = EstadoVoo::BAIXA_ENERGIA;
-                    Serial.println("[STATE] ALTA_ENERGIA → BAIXA_ENERGIA");
+                    Serial.println(F("[STATE] ALTA_ENERGIA -> BAIXA_ENERGIA"));
                 }
                 break;
 
@@ -67,8 +67,8 @@ namespace StateMachine {
                 // margem definida abaixo do pico registrado
                 if (dadosVoo.altitude < altitudeMaxima - MARGEM_APOGEU) {
                     dadosVoo.estado = EstadoVoo::QUEDA;
-                    Serial.println("[STATE] BAIXA_ENERGIA → QUEDA");
-                    if(Ejection::ejectionEvent()) Serial.println("[EVENT] PARAQUEDAS ACIONADO");
+                    Serial.println(F("[STATE] BAIXA_ENERGIA -> QUEDA"));
+                    if(Ejection::ejectionEvent()) Serial.println(F("[EVENT] PARAQUEDAS ACIONADO"));
                 }
                 break;
 
@@ -76,7 +76,7 @@ namespace StateMachine {
                 // Solo detectado: altitude abaixo do threshold
                 if (dadosVoo.altitude < THRESHOLD_SOLO) {
                     dadosVoo.estado = EstadoVoo::ATERRISSADO;
-                    Serial.println("[STATE] QUEDA → ATERRISSADO");
+                    Serial.println(F("[STATE] QUEDA -> ATERRISSADO"));
                 }
                 break;
 

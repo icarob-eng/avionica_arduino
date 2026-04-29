@@ -64,23 +64,19 @@ namespace Telemetry {
         unsigned long inicio = millis();
         while (!(PINB & (1 << 0))) {
             if (millis() - inicio > 1000) {
-                Serial.println("[TELEMETRY] Timeout: modulo nao respondeu.");
+                Serial.println(F("[TELEMETRY] Timeout: modulo nao respondeu."));
                 return false;
             }
         }
 
-        Serial.println("[TELEMETRY] LoRa E32 inicializado.");
+        Serial.println(F("[TELEMETRY] LoRa E32 inicializado."));
         return true;
     }
 
     void sendPacket() {
-        // --- Polling do AUX antes de transmitir ---
-        unsigned long inicio = millis();
-        while (!(PINB & (1 << 0))) {
-            if (millis() - inicio > 1000) {
-                Serial.println("[TELEMETRY] Timeout no envio.");
-                return;
-            }
+        // --- Verificação não-bloqueante do AUX ---
+        if (digitalRead(LORA_AUX_PIN) != HIGH) {
+            return; // Módulo ocupado, tenta novamente no próximo ciclo
         }
 
         // Monta o pacote a partir da variável global dadosVoo

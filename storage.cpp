@@ -23,8 +23,8 @@ static SPIFlash flash(FLASH_CS_PIN);
 // ------------------------------------------------------------
 static uint32_t contadorRegistros = 0;
 
-// Buffer interno (10 amostras)
-#define BUFFER_SIZE 10
+// Buffer interno (3 amostras) - reduzido ainda mais para economizar RAM
+#define BUFFER_SIZE 3
 static DadosVoo buffer[BUFFER_SIZE];
 static uint8_t bufferIndex = 0;
 
@@ -58,6 +58,10 @@ namespace Storage {
         if (bufferIndex >= BUFFER_SIZE) {
             flush();
         }
+    }
+
+    void saveData() {
+        push(dadosVoo);
     }
 
     void flush() {

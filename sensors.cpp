@@ -20,13 +20,13 @@ namespace Sensor {
     bool setup() {
         // Tenta inicializar o MPU-6050 no endereço padrão 0x68
         if (!mpu.begin()) {
-            Serial.println("[SENSOR] MPU-6050 nao encontrado!");
+            Serial.println(F("[SENSOR] MPU-6050 nao encontrado!"));
             return false;
         }
 
         // Tenta inicializar o BMP280 no endereço 0x76
         if (!bmp.begin(0x76)) {
-            Serial.println("[SENSOR] BMP280 nao encontrado!");
+            Serial.println(F("[SENSOR] BMP280 nao encontrado!"));
             return false;
         }
 
@@ -47,15 +47,9 @@ namespace Sensor {
         // Modo normal: sensor faz medições continuamente
         // Oversampling x4 para pressão e temperatura: melhor
         // precisão com custo moderado de tempo
-        bmp.setSampling(
-            Adafruit_BMP280::MODE_NORMAL,
-            Adafruit_BMP280::SAMPLING_X4,   // temperatura
-            Adafruit_BMP280::SAMPLING_X4,   // pressão
-            Adafruit_BMP280::FILTER_X4,     // filtro IIR
-            Adafruit_BMP280::STANDBY_MS_1   // 1ms entre medições
-        );
+        bmp.setSampling(Adafruit_BMP280::MODE_NORMAL);
 
-        Serial.println("[SENSOR] MPU-6050 e BMP280 inicializados.");
+        Serial.println(F("[SENSOR] MPU-6050 e BMP280 inicializados."));
         return true;
     }
 
@@ -77,10 +71,10 @@ namespace Sensor {
         // --- Leitura do BMP280 ---
         dadosVoo.pressao     = bmp.readPressure() / 100.0F; // Pa → hPa
         dadosVoo.temperatura = bmp.readTemperature();
-        dadosVoo.altitude    = bmp.readAltitude(1013.25);   // pressão ao nível do mar padrão
+        dadosVoo.altitude    = bmp.readAltitude(PRESSAO_NIVEL_MAR);   // pressão ao nível do mar padrão
 
         // --- Timestamp ---
         dadosVoo.timestamp = millis();
     }
 
-}
+} 
