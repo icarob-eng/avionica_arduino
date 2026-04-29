@@ -79,13 +79,22 @@ namespace Telemetry {
             return; // Módulo ocupado, tenta novamente no próximo ciclo
         }
 
+        // --- Throttling: transmite apenas a cada 1s ---
+        static unsigned long ultimaTransmissao = 0;
+        unsigned long agora = millis();
+        
+        if (agora - ultimaTransmissao < 1000) {
+            // Menos de 1s desde a última transmissão: descarta pacote
+            return;
+        }
+
+        ultimaTransmissao = agora;
+
         // Monta o pacote a partir da variável global dadosVoo
         PacoteTelemetria pacote;
         pacote.acelX     = dadosVoo.acelX;
         pacote.acelY     = dadosVoo.acelY;
         pacote.acelZ     = dadosVoo.acelZ;
-        pacote.altitude  = dadosVoo.altitude;
-        pacote.pressao   = dadosVoo.pressao;
         pacote.timestamp = dadosVoo.timestamp;
         pacote.estado    = dadosVoo.estado;
 
@@ -100,6 +109,10 @@ namespace Telemetry {
         // Justificativa: ver cabeçalho telemetry.hpp.
         // Função mantida no namespace para compatibilidade
         // com o esqueleto definido pelo gerente do projeto.
+        while(loraSerial.available()){
+            loraSerial.read();
+            //Lê sem preocessar nada (descarte)
+        }
     }
 
 }
