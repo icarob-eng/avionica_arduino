@@ -49,9 +49,18 @@ DadosVoo dadosVoo;
 // `volatile` obrigatório: modificadas dentro de ISRs.
 // =============================================================
 
+// Flag de formatação de memória
+// Não formata a memória por padrão
+#define formatacao false
+
 // Contador de ticks do Timer1 (100Hz).
 // Controla a cadência de leitura e transmissão.
 static volatile uint8_t contadorTicks = 0;
+
+// Diretivas para frequência dos ciclos 
+// Baseado na frequência do timer e a frequência desejada dos ciclos
+#define freqLeituraGravacao 4 // Ciclo de leitura e gravação (25Hz)
+#define freqTransmissao 20 // Ciclo de transmissão (5Hz)
 
 // Flag setada pela ISR do MPU-6050 (INT0).
 // Indica que uma nova amostra está disponível para leitura.
@@ -154,7 +163,9 @@ void setup() {
     StateMachine::setup();
 
     // Apaga a flash antes do voo
-    Storage::formatMemory();
+    if(formatacao){
+        Storage::formatMemory();
+    }
 
     // Habilita interrupções globais
     sei();
@@ -181,18 +192,26 @@ void loop() {
     sei();
 
     // --- Ciclo de leitura e gravação (25Hz) ---
-    if (leituraPendente && (tick % 4 == 0)) {
+    if (leituraPendente && (tick % freqLeituraGravacao == 0)) {
         leituraPendente = false;
 
         if (dadosVoo.estado != EstadoVoo::ATERRISSADO) {
+
+            // --------------------------------------------------------------
+            // Os dados devem sempre serem lidos
+            // Os dados devem apenas serem salvos em estágios de coleta ativa
+            // -------------------------------------------------------------
+
             Sensor::readData();
             StateMachine::update();
-            Storage::saveData();
+            if(StateMachine::coletaAtiva){
+                Storage::saveData();
+            }
         }
     }
 
     // --- Ciclo de transmissão (5Hz) ---
-    if (tick % 20 == 0) {
+    if (tick % freqTransmissao == 0) {
         Telemetry::sendPacket();
     }
 }

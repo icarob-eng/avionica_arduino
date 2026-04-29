@@ -10,14 +10,20 @@
 #include <math.h>
 #include "ejection.hpp"
 
-// ------------------------------------------------------------
-// Altitude máxima registrada durante o voo.
-// Atualizada a cada leitura enquanto o foguete sobe.
-// Usada para detectar o apogeu na fase BAIXA_ENERGIA.
-// ------------------------------------------------------------
-static float altitudeMaxima = 0.0;
-
 namespace StateMachine {
+
+    // ------------------------------------------------------------
+    // Altitude máxima registrada durante o voo.
+    // Atualizada a cada leitura enquanto o foguete sobe.
+    // Usada para detectar o apogeu na fase BAIXA_ENERGIA.
+    // ------------------------------------------------------------
+    static float altitudeMaxima = 0.0;
+
+    // ------------------------------------------------------------
+    // Flag de coleta de dados
+    // No inicio a flag deve ser falsa
+    // ------------------------------------------------------------
+    bool coletaAtiva = false;
 
     void setup() {
         dadosVoo.estado = EstadoVoo::ARMADO;
@@ -47,6 +53,10 @@ namespace StateMachine {
                 break;
 
             case EstadoVoo::ALTA_ENERGIA:
+
+                // Inicio de coleta
+               coletaAtiva = true;
+                
                 // Atualiza altitude máxima enquanto sobe
                 if (dadosVoo.altitude > altitudeMaxima)
                     altitudeMaxima = dadosVoo.altitude;
@@ -83,6 +93,10 @@ namespace StateMachine {
             case EstadoVoo::ATERRISSADO:
                 // Estado final — nenhuma transição possível.
                 // O loop principal reduz a frequência de coleta.
+
+                // Finalização de coleta
+                coletaAtiva = true;
+
                 break;
         }
     }

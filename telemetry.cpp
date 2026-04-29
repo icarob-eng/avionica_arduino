@@ -30,16 +30,16 @@
 #include "globals.hpp"
 #include <SoftwareSerial.h>
 
-// ------------------------------------------------------------
-// SoftwareSerial para comunicação com o E32.
-// Custo de transmissão: 1 bit a cada 1/9600s
-// Para sizeof(PacoteTelemetria) ≈ 25 bytes:
-//   25 × 10 bits (8 dados + start + stop) = 250 bits
-//   250 / 9600 = 26.04ms = ~416.666 clocks
-// ------------------------------------------------------------
-static SoftwareSerial loraSerial(LORA_RX_PIN, LORA_TX_PIN);
-
 namespace Telemetry {
+
+    // ------------------------------------------------------------
+    // SoftwareSerial para comunicação com o E32.
+    // Custo de transmissão: 1 bit a cada 1/9600s
+    // Para sizeof(PacoteTelemetria) ≈ 25 bytes:
+    //   25 × 10 bits (8 dados + start + stop) = 250 bits
+    //   250 / 9600 = 26.04ms = ~416.666 clocks
+    // ------------------------------------------------------------
+    static SoftwareSerial loraSerial(LORA_RX_PIN, LORA_TX_PIN);
 
     bool setup() {
         loraSerial.begin(9600);

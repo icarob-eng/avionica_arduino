@@ -12,10 +12,11 @@
 // Objetos das bibliotecas — ficam aqui, invisíveis ao resto
 // do projeto. Só sensors.cpp sabe que eles existem.
 // ------------------------------------------------------------
-static Adafruit_MPU6050 mpu;
-static Adafruit_BMP280 bmp;
 
 namespace Sensor {
+
+    static Adafruit_MPU6050 mpu;
+    static Adafruit_BMP280 bmp;
 
     bool setup() {
         // Tenta inicializar o MPU-6050 no endereço padrão 0x68

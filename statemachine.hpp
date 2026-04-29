@@ -32,6 +32,13 @@ namespace StateMachine {
      */
     void update();
 
+    /**
+     * Flag de coleta de dados
+     *  Ela deve se manter falsa enquanto não há dados sendo coletados.
+     *  Ela deve se manter verdadeira quando os dados são coletados
+     */
+    extern bool coletaAtiva; 
+
 }
 
 #endif // STATEMACHINE_HPP

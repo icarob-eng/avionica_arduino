@@ -12,23 +12,27 @@
 #include "globals.hpp"
 #include <SPIMemory.h>
 
-// ------------------------------------------------------------
-// Objeto da biblioteca — privado a este arquivo.
-// ------------------------------------------------------------
-static SPIFlash flash(FLASH_CS_PIN);
-
-// ------------------------------------------------------------
-// Contador de registros gravados — mantido em RAM.
-// Zerado ao ligar; não sobrevive a um reset.
-// ------------------------------------------------------------
-static uint32_t contadorRegistros = 0;
-
 // Buffer interno (3 amostras) - reduzido ainda mais para economizar RAM
 #define BUFFER_SIZE 3
-static DadosVoo buffer[BUFFER_SIZE];
-static uint8_t bufferIndex = 0;
 
 namespace Storage {
+
+    // ------------------------------------------------------------
+    // Objeto da biblioteca — privado a este arquivo.
+    // ------------------------------------------------------------
+    static SPIFlash flash(FLASH_CS_PIN);
+
+    // ------------------------------------------------------------
+    // Contador de registros gravados — mantido em RAM.
+    // Zerado ao ligar; não sobrevive a um reset.
+    // ------------------------------------------------------------
+    static uint32_t contadorRegistros = 0;
+
+    // ------------------------------------------------------------
+    // Dados relacionados ao buffer
+    // ------------------------------------------------------------
+    static DadosVoo buffer[BUFFER_SIZE];
+    static uint8_t bufferIndex = 0;
 
     bool setup() {
         if (!flash.begin()) {
