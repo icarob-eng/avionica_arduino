@@ -99,7 +99,6 @@ struct DadosVoo {
     float altitude;     // metros
 
     // Contexto da missão
-    unsigned long timestamp;  // ms desde o boot (millis())
     EstadoVoo estado;         // fase atual do voo
 };
 
